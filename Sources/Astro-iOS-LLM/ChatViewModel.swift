@@ -13,8 +13,8 @@ class ChatViewModel: ObservableObject {
     @Published var hfModelID: String = "unsloth/gemma-3-1b-it-GGUF"
     @Published var hfFilename: String = "gemma-3-1b-it-Q4_K_S.gguf"
     
-    private var client: (any LocalLLMClient)?
-    private var chatHistory: [LocalLLMClient.Message] = []
+    private var client: (any LLMClient)?
+    private var chatHistory: [LLMInput.Message] = []
     
     struct Message: Identifiable {
         let id = UUID()
@@ -32,12 +32,12 @@ class ChatViewModel: ObservableObject {
             modelStatus = "Loading model..."
             
             // Initialize the llama backend
-            let llamaClient = try LocalLLMClientLlama(modelURL: modelPath)
+            let llamaClient = try await LocalLLMClient.llama(url: modelPath)
             self.client = llamaClient
             
             // Add initial system prompt if needed
             chatHistory = [
-                .init(role: .system, content: "You are a helpful assistant running locally on an iOS device.")
+                .system("You are a helpful assistant running locally on an iOS device.")
             ]
             
             modelStatus = "Ready"
@@ -81,14 +81,14 @@ class ChatViewModel: ObservableObject {
         
         inputText = ""
         messages.append(Message(text: userMessage, isUser: true))
-        chatHistory.append(.init(role: .user, content: userMessage))
+        chatHistory.append(.user(userMessage))
         
         // Add empty assistant message placeholder
         messages.append(Message(text: "", isUser: false))
         
         Task {
             do {
-                let stream = try await client.chat(messages: chatHistory)
+                let stream = try await client.textStream(from: .chat(chatHistory))
                 
                 var responseText = ""
                 for try await chunk in stream {
@@ -100,7 +100,7 @@ class ChatViewModel: ObservableObject {
                     }
                 }
                 
-                chatHistory.append(.init(role: .assistant, content: responseText))
+                chatHistory.append(.assistant(responseText))
                 
             } catch {
                 if let lastIndex = self.messages.indices.last {
