@@ -1,0 +1,49 @@
+name: iOS Unsigned Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Select Xcode
+      run: sudo xcode-select -s /Applications/Xcode_15.2.app/Contents/Developer || sudo xcode-select -s /Applications/Xcode_15.3.app/Contents/Developer || sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer || true
+
+    - name: Install XcodeGen
+      run: brew install xcodegen
+
+    - name: Generate Xcode Project
+      run: xcodegen generate
+
+    - name: Build
+      run: |
+        xcodebuild clean build \
+          -project Astro-iOS-LLM.xcodeproj \
+          -scheme Astro-iOS-LLM \
+          -destination 'generic/platform=iOS' \
+          CONFIGURATION_BUILD_DIR=build \
+          CODE_SIGNING_ALLOWED=NO \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          -parallelizeTargets \
+          -jobs 4
+
+    - name: Package IPA
+      run: |
+        mkdir -p Payload
+        cp -r build/Astro-iOS-LLM.app Payload/
+        zip -r Astro-iOS-LLM.ipa Payload
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Astro-iOS-LLM-IPA
+        path: Astro-iOS-LLM.ipa
