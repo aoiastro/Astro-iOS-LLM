@@ -34,7 +34,9 @@ jobs:
           "CODE_SIGNING_REQUIRED[sdk=iphoneos*]"=NO \
           "CODE_SIGNING_ALLOWED[sdk=iphoneos*]"=NO \
           -skipMacroValidation \
-          -jobs 2
+          ONLY_ACTIVE_ARCH=YES \
+          ARCHS=arm64 \
+          -jobs 1
 
     - name: Package IPA
       run: |
