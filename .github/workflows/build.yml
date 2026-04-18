@@ -29,7 +29,7 @@ jobs:
           -project Astro-iOS-LLM.xcodeproj \
           -scheme Astro-iOS-LLM \
           -destination 'generic/platform=iOS' \
-          CONFIGURATION_BUILD_DIR=build \
+          CONFIGURATION_BUILD_DIR=$PWD/build \
           "CODE_SIGN_IDENTITY[sdk=iphoneos*]"="" \
           "CODE_SIGNING_REQUIRED[sdk=iphoneos*]"=NO \
           "CODE_SIGNING_ALLOWED[sdk=iphoneos*]"=NO \
