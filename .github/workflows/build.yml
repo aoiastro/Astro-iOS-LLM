@@ -34,8 +34,7 @@ jobs:
           CODE_SIGN_IDENTITY="" \
           CODE_SIGNING_REQUIRED=NO \
           -skipMacroValidation \
-          -parallelizeTargets \
-          -jobs 4
+          -jobs 2
 
     - name: Package IPA
       run: |

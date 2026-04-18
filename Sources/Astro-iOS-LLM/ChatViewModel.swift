@@ -13,7 +13,7 @@ class ChatViewModel: ObservableObject {
     @Published var hfModelID: String = "unsloth/gemma-3-1b-it-GGUF"
     @Published var hfFilename: String = "gemma-3-1b-it-Q4_K_S.gguf"
     
-    private var client: (any LLMClient)?
+    private var client: LlamaClient?
     private var chatHistory: [LLMInput.Message] = []
     
     struct Message: Identifiable {
