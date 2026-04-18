@@ -5,7 +5,7 @@ targets:
   Astro-iOS-LLM:
     type: application
     platform: iOS
-    deploymentTarget: "16.0"
+    deploymentTarget: "17.0"
     sources:
       - Sources/Astro-iOS-LLM
     settings:
@@ -23,8 +23,6 @@ targets:
         product: LocalLLMClient
       - package: LocalLLMClient
         product: LocalLLMClientLlama
-      - package: LocalLLMClient
-        product: LocalLLMClientUtility
 
 packages:
   LocalLLMClient:
