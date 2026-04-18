@@ -30,8 +30,9 @@ jobs:
           -scheme Astro-iOS-LLM \
           -destination 'generic/platform=iOS' \
           CONFIGURATION_BUILD_DIR=build \
-          CODE_SIGN_IDENTITY="-" \
-          CODE_SIGNING_REQUIRED=NO \
+          "CODE_SIGN_IDENTITY[sdk=iphoneos*]"="" \
+          "CODE_SIGNING_REQUIRED[sdk=iphoneos*]"=NO \
+          "CODE_SIGNING_ALLOWED[sdk=iphoneos*]"=NO \
           -skipMacroValidation \
           -jobs 2
 
