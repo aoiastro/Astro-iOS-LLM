@@ -17,7 +17,7 @@ struct ChatView: View {
                             ProgressView()
                                 .padding()
                         } else {
-                            Button("Load Model") {
+                            Button("モデルをロード") {
                                 Task {
                                     await viewModel.setupModel()
                                 }
@@ -78,7 +78,7 @@ struct ChatView: View {
                             TextField("HF Filename", text: $viewModel.hfFilename)
                         }
                         
-                        Button("Apply and Reload") {
+                        Button("適用して再読込み") {
                             showSettings = false
                             Task {
                                 await viewModel.setupModel()
