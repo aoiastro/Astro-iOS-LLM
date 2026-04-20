@@ -8,6 +8,8 @@ class ChatViewModel: ObservableObject {
     @Published var inputText: String = ""
     @Published var isDownloading: Bool = false
     @Published var modelStatus: String = "Not loaded"
+    @Published var selectedDocumentName: String? = nil
+    @Published var attachedContent: String? = nil
     
     // Default model specified by user
     @Published var hfModelID: String = "unsloth/gemma-3-1b-it-GGUF"
@@ -71,16 +73,42 @@ class ChatViewModel: ObservableObject {
         return destinationURL
     }
     
+    func attachDocument(at url: URL) {
+        let shouldStopAccessing = url.startAccessingSecurityScopedResource()
+        defer {
+            if shouldStopAccessing {
+                url.stopAccessingSecurityScopedResource()
+            }
+        }
+        
+        do {
+            let content = try String(contentsOf: url, encoding: .utf8)
+            self.attachedContent = content
+            self.selectedDocumentName = url.lastPathComponent
+        } catch {
+            print("Failed to read file: \(error)")
+        }
+    }
+    
     func sendMessage() {
-        let userMessage = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !userMessage.isEmpty else { return }
+        var userMessage = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !userMessage.isEmpty || attachedContent != nil else { return }
         guard let client = client else {
             modelStatus = "Model not ready"
             return
         }
         
+        let displayMessage = userMessage.isEmpty ? "Attached: \(selectedDocumentName ?? "File")" : userMessage
+        
+        if let attached = attachedContent {
+            userMessage = "Attached File (\(selectedDocumentName ?? "document")): \n\(attached)\n\nUser Message: \(userMessage)"
+        }
+        
         inputText = ""
-        messages.append(Message(text: userMessage, isUser: true))
+        attachedContent = nil
+        selectedDocumentName = nil
+        
+        messages.append(Message(text: displayMessage, isUser: true))
         chatHistory.append(.user(userMessage))
         
         // Add empty assistant message placeholder
